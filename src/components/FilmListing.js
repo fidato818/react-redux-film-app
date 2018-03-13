@@ -1,7 +1,27 @@
 import React, { Component } from 'react';
 import FilmRow from './FilmRow';
+import { connect } from 'react-redux';
+import { toggleFave, clickDetails } from '../actions/index';
 
-class FilmListing extends Component {
+
+
+const mapDispatchToProps = dispatch => {
+  return {
+    toggleFave: film => dispatch(toggleFave(film)),
+    clickDetails: film => dispatch(clickDetails(film))
+  }
+}
+
+const mapPropsToState = state => {
+  return {
+    films: state.films,
+    faves: state.faves
+  }
+}
+
+
+
+class ConnectedFilmListing extends Component {
   constructor(props) {
     super(props)
     this.state = {
@@ -13,13 +33,11 @@ class FilmListing extends Component {
     this.setState({
       filter: filter
     })
-    console.log("setting filter to: " + filter);
   }
 
   render() {
 
     const { faves, films } = this.props
-
     var allFilter = (this.state.filter === 'all' ? 'is-active' : '')
     var favesFilter = (this.state.filter === 'faves' ? 'is-active' : '')
 
@@ -31,8 +49,9 @@ class FilmListing extends Component {
 
     let allFilms = filmsToShow.map( (film,index) => {
       return(
-        <FilmRow onFaveToggle={() => this.props.onFaveToggle(film)}
-          onDetailsClick={() => this.props.onDetailsClick(film)}
+        <FilmRow
+          onFaveToggle={() => this.props.toggleFave(film)}
+          onDetailsClick={() => this.props.clickDetails(film)}
           title={film.title}
           date={film.release_date}
           key={film.id}
@@ -62,5 +81,7 @@ class FilmListing extends Component {
     );
   }
 }
+
+const FilmListing = connect(mapPropsToState, mapDispatchToProps)(ConnectedFilmListing)
 
 export default FilmListing;
